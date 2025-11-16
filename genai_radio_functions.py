@@ -1,3 +1,4 @@
+import os
 import sqlite3
 import random
 from openai import OpenAI
@@ -33,22 +34,24 @@ def init_db():
 
 # ============================================================
 # Replace fetch_live_news with OpenAI generator
-# ============================================================
+# ===========================================================
 def fetch_live_news(topic):
-    """Generate topic-based explanation instead of live news."""
+    client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+
     prompt = f"""
-    Create a friendly, engaging podcast narration about: {topic}.
-    Requirements:
-    - Do NOT mention dates or breaking news
-    - Write as a general topic explanation (5–6 sentences)
-    - Smooth, conversational, radio-host style
+    Give a short 3–4 sentence news-style update about this topic:
+    {topic}
+
+    Keep it factual, clear and easy to read.
     """
 
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[{"role": "user", "content": prompt}]
     )
-    return response.choices[0].message["content"].strip()
+
+    # NEW SDK FORMAT
+    return response.choices[0].message.content.strip()
 
 # ============================================================
 # MCQ Generator (unchanged)
